@@ -6,6 +6,8 @@
 // Множество - реализация через битовые поля
 
 #include "tset.h"
+#include <iostream>
+#include <stdexcept>
 
 TSet::TSet(int mp) : BitField(mp)
 {
@@ -41,12 +43,16 @@ int TSet::IsMember(const int Elem) const // элемент множества?
 
 void TSet::InsElem(const int Elem) // включение элемента множества
 {
-  BitField.SetBit(Elem);
+  if ((Elem >= 0) && (Elem < MaxPower)) {
+    BitField.SetBit(Elem);
+  }
 }
 
 void TSet::DelElem(const int Elem) // исключение элемента множества
 {
-  BitField.ClrBit(Elem);
+  if ((Elem >= 0) && (Elem < MaxPower)) {
+    BitField.ClrBit(Elem);
+  }
 }
 
 // теоретико-множественные операции
@@ -81,6 +87,9 @@ TSet TSet::operator+(const TSet &s) // объединение
 TSet TSet::operator+(const int Elem) // объединение с элементом
 {
   TSet res(*this);
+  if ((Elem < 0) || (Elem >= MaxPower)) {
+    throw std::out_of_range("element out of range");
+  }
   res.InsElem(Elem);
   return res;
 }
@@ -94,7 +103,7 @@ TSet TSet::operator-(const int Elem) // разность с элементом
 
 TSet TSet::operator*(const TSet &s) // пересечение
 {
-  TSet res(MaxPower < s.MaxPower ? MaxPower : s.MaxPower);
+  TSet res(MaxPower > s.MaxPower ? MaxPower : s.MaxPower);
   res.BitField = BitField & s.BitField;
   return res;
 }
